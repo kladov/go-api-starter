@@ -1,7 +1,21 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/kladov/go-api-starter/handler"
+	"github.com/kladov/go-api-starter/mux"
+)
 
 func main() {
-	fmt.Print("Hello world!")
+	r := mux.NewSimpleHTTPRouter()
+	r.WithRoutes([]mux.Route{
+		&handler.IndexRoute{},
+		&handler.NotFoundRoute{},
+	})
+	err := http.ListenAndServe(":8080", r)
+	if err != nil {
+		fmt.Errorf("Error while serve http request: %+s", err)
+	}
 }
