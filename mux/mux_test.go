@@ -8,11 +8,7 @@ import (
 
 func TestSimpleHTTPRouter_ServeHTTPMiddlewareOrder(t *testing.T) {
 	r := NewSimpleHTTPRouter()
-	r.WithRoutes([]Route{
-		NewRouteMock(func(r *http.Request) http.HandlerFunc {
-			return h1
-		}),
-	})
+	r.WithRoutes([]Route{NewRouteStub()})
 	r.WithMiddleware([]Middleware{mw1, mw2})
 
 	req, err := http.NewRequest("GET", "/", nil)
@@ -31,11 +27,7 @@ func TestSimpleHTTPRouter_ServeHTTPMiddlewareOrder(t *testing.T) {
 
 func TestSimpleHTTPRouter_ServeHTTPMiddlewareBrake(t *testing.T) {
 	r := NewSimpleHTTPRouter()
-	r.WithRoutes([]Route{
-		NewRouteMock(func(r *http.Request) http.HandlerFunc {
-			return h1
-		}),
-	})
+	r.WithRoutes([]Route{NewRouteStub()})
 	r.WithMiddleware([]Middleware{mw1, mwBrake})
 
 	req, err := http.NewRequest("GET", "/", nil)
@@ -82,6 +74,12 @@ type RouteMock struct {
 
 func NewRouteMock(matchFunc func(r *http.Request) http.HandlerFunc) Route {
 	return &RouteMock{matchFunc}
+}
+
+func NewRouteStub() Route {
+	return NewRouteMock(func(r *http.Request) http.HandlerFunc {
+		return h1
+	})
 }
 
 func (routeMock *RouteMock) MatchHandler(r *http.Request) http.HandlerFunc {
