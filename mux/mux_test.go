@@ -8,7 +8,7 @@ import (
 
 func TestSimpleHTTPRouter_ServeHTTPMiddlewareOrder(t *testing.T) {
 	r := NewSimpleHTTPRouter()
-	r.WithRoutes([]Route{NewRouteStub()})
+	r.WithRoutes([]Route{MakeRouteStub(h1)})
 	r.WithMiddleware([]Middleware{mw1, mw2})
 
 	req, err := http.NewRequest("GET", "/", nil)
@@ -27,7 +27,7 @@ func TestSimpleHTTPRouter_ServeHTTPMiddlewareOrder(t *testing.T) {
 
 func TestSimpleHTTPRouter_ServeHTTPMiddlewareBrake(t *testing.T) {
 	r := NewSimpleHTTPRouter()
-	r.WithRoutes([]Route{NewRouteStub()})
+	r.WithRoutes([]Route{MakeRouteStub(h1)})
 	r.WithMiddleware([]Middleware{mw1, mwBrake})
 
 	req, err := http.NewRequest("GET", "/", nil)
@@ -41,6 +41,48 @@ func TestSimpleHTTPRouter_ServeHTTPMiddlewareBrake(t *testing.T) {
 
 	if rr.Body.String() != "mw1->mwBrake " {
 		t.Errorf("Middleware brake not work. It should be 'mw1->mwBrake ', '%s' given", rr.Body.String())
+	}
+}
+
+func TestSimpleHTTPRouter_ServeHTTPHandlersOrder(t *testing.T) {
+	r := NewSimpleHTTPRouter()
+	r.WithRoutes([]Route{
+		MakeRouteStub(h1),
+		MakeRouteStub(h2),
+	})
+
+	req, err := http.NewRequest("GET", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rr := httptest.NewRecorder()
+
+	r.ServeHTTP(rr, req)
+
+	if rr.Body.String() != "h1" {
+		t.Errorf("Wrong handler called. (called: '%s')", rr.Body.String())
+	}
+}
+
+func TestSimpleHTTPRouter_ServeHTTPHandlersOrderSkipFirst(t *testing.T) {
+	r := NewSimpleHTTPRouter()
+	r.WithRoutes([]Route{
+		MakeRouteStub(nil),
+		MakeRouteStub(h2),
+	})
+
+	req, err := http.NewRequest("GET", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rr := httptest.NewRecorder()
+
+	r.ServeHTTP(rr, req)
+
+	if rr.Body.String() != "h2" {
+		t.Errorf("Wrong handler called. (called: '%s')", rr.Body.String())
 	}
 }
 
@@ -68,6 +110,10 @@ var h1 http.HandlerFunc = func(writer http.ResponseWriter, request *http.Request
 	writer.Write([]byte("h1"))
 }
 
+var h2 http.HandlerFunc = func(writer http.ResponseWriter, request *http.Request) {
+	writer.Write([]byte("h2"))
+}
+
 type RouteMock struct {
 	MatchFunc func(r *http.Request) http.HandlerFunc
 }
@@ -76,9 +122,9 @@ func NewRouteMock(matchFunc func(r *http.Request) http.HandlerFunc) Route {
 	return &RouteMock{matchFunc}
 }
 
-func NewRouteStub() Route {
+func MakeRouteStub(h http.HandlerFunc) Route {
 	return NewRouteMock(func(r *http.Request) http.HandlerFunc {
-		return h1
+		return h
 	})
 }
 
