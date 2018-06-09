@@ -19,6 +19,8 @@ type SimpleHTTPRouter struct {
 	middleware []Middleware
 }
 
+var _ http.Handler = (*SimpleHTTPRouter)(nil)
+
 // NewSimpleHTTPRouter crete new instance of SimpleHTTPRouter
 func NewSimpleHTTPRouter() *SimpleHTTPRouter {
 	return &SimpleHTTPRouter{}
