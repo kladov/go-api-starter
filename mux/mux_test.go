@@ -40,7 +40,7 @@ func TestSimpleHTTPRouter_ServeHTTPMiddlewareBrake(t *testing.T) {
 	r.ServeHTTP(rr, req)
 
 	if rr.Body.String() != "mw1->mwBrake " {
-		t.Errorf("Middleware brake not wirk. It should be 'mw1->mwBrake ', '%s' given", rr.Body.String())
+		t.Errorf("Middleware brake not work. It should be 'mw1->mwBrake ', '%s' given", rr.Body.String())
 	}
 }
 
