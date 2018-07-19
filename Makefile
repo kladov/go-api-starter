@@ -1,4 +1,7 @@
 .PHONY: build clean test
+
+GOPATH?=$(HOME)/go
+
 build:
 	go build -o $(GOPATH)/bin/go-api-starter ./cmd/main.go 
 
