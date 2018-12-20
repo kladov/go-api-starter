@@ -1,0 +1,1 @@
+docker logs go-api-starter -f

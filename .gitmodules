@@ -1,0 +1,4 @@
+git
+[submodule "swagger-ui"]
+	path = swagger-ui
+	url = git@github.com:kladov/swagger-ui.git
