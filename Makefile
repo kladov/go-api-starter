@@ -1,9 +1,13 @@
 .PHONY: build clean test
 
 GOPATH?=$(HOME)/go
+GO111MODULE=on
+
+deps:
+	go mod tidy && go mod vendor
 
 build:
-	go build -o $(GOPATH)/bin/go-api-starter ./cmd/main.go 
+	go build -o $(GOPATH)/bin/go-api-starter ./cmd/main.go
 
 clean:
 	rm -rf $(GOPATH)/bin/go-api-starter

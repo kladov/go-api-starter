@@ -4,7 +4,11 @@ ADD . /go/src/github.com/kladov/go-api-starter
 
 WORKDIR /go/src/github.com/kladov/go-api-starter
 
+ENV GO111MODULE=on
+
 RUN make update-swagger
+
+RUN make deps
 
 RUN make build
 
